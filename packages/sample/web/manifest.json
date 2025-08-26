@@ -1,0 +1,11 @@
+{
+    "name": "sample",
+    "short_name": "sample",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0175C2",
+    "theme_color": "#0175C2",
+    "description": "diskrot Sample Application.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false
+}
