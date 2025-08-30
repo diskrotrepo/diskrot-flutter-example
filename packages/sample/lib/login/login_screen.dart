@@ -1,6 +1,9 @@
+import 'dart:math';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:sample/dependency_context.dart';
-import '../auth/auth_repository.dart';
+import 'package:sample/configuration/configuration.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:watch_it/watch_it.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,65 +13,49 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   String _error = '';
 
-  @override
-  void initState() {
-    super.initState();
-    _redirectIfAuthenticated();
+  // Optional: CSRF state helper
+  String _csrfState([int length = 32]) {
+    final r = Random.secure();
+    final bytes = List<int>.generate(length, (_) => r.nextInt(256));
+    return base64Url.encode(bytes).replaceAll('=', '');
   }
 
-  void _redirectIfAuthenticated() {
-    di<AuthRepository>().getIdToken().then((token) {
-      if (!mounted) return;
-      if (token != null && token.isNotEmpty) {
-        Navigator.pushReplacementNamed(context, '/app');
-      }
-    });
-  }
+  Future<void> _login() async {
+    late Uri authUri;
 
-  void _login() async {
-    final res = await di<AuthRepository>().login(
-      _emailController.text,
-      _passwordController.text,
+    if (di.get<Configuration>().secure) {
+      authUri = Uri.https(di.get<Configuration>().loginUri, '/authorize', {
+        'client_id': di.get<Configuration>().applicationId,
+        'redirect_uri': di.get<Configuration>().redirectUri,
+        'response_type': 'code',
+      });
+    } else {
+      authUri = Uri.http(di.get<Configuration>().loginUri, '/authorize', {
+        'client_id': di.get<Configuration>().applicationId,
+        'redirect_uri': di.get<Configuration>().redirectUri,
+        'response_type': 'code',
+      });
+    }
+
+    final ok = await launchUrlString(
+      authUri.toString(),
+      webOnlyWindowName: '_self',
     );
 
-    if (!mounted) return;
-
-    if (res.statusCode == 200) {
-      Navigator.pushReplacementNamed(context, '/app');
-    } else {
-      setState(() => _error = 'Login failed');
+    if (!ok && mounted) {
+      setState(() => _error = 'Could not open login page');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: Row(
         children: [
-          Expanded(
-            flex: 1,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        right: BorderSide(
-                            color: Colors.pinkAccent.shade100, width: 2),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Right half (form)
+          // Right half (single login button)
           Expanded(
             flex: 1,
             child: Center(
@@ -86,53 +73,39 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const Text(
-                      'developer portal',
+                      'sample app',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Colors.black,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 30),
-                    _buildInputField('email', _emailController),
-                    const SizedBox(height: 16),
-                    _buildInputField('password', _passwordController,
-                        obscure: true),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/forgot-password'),
-                        child: const Text(
-                          'forgot password?',
-                          style: TextStyle(fontSize: 10, color: Colors.white70),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _login,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.pinkAccent,
-                          padding: const EdgeInsets.symmetric(vertical: 5),
+                          backgroundColor: Colors.grey,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
                         child: const Text(
-                          'login',
+                          'login with diskrot',
                           style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     if (_error.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 16),
-                        child: Text(_error,
-                            style: const TextStyle(color: Colors.red)),
+                        child: Text(
+                          _error,
+                          style: const TextStyle(color: Colors.red),
+                        ),
                       ),
                   ],
                 ),
@@ -140,22 +113,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildInputField(String label, TextEditingController controller,
-      {bool obscure = false}) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      style: const TextStyle(fontWeight: FontWeight.bold),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[300],
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.black),
-        border: InputBorder.none,
       ),
     );
   }
