@@ -25,8 +25,12 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
     final uri = Uri.base;
     final code = uri.queryParameters['code'];
     final returnedState = uri.queryParameters['state'];
-    final error = uri.queryParameters['error'];
-    final errorDesc = uri.queryParameters['error_description'];
+    final error = uri.queryParameters.containsKey('error')
+        ? uri.queryParameters['error']
+        : null;
+    final errorDesc = uri.queryParameters.containsKey('error_description')
+        ? uri.queryParameters['error_description']
+        : null;
 
     if (error != null) {
       setState(
@@ -50,8 +54,8 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
     try {
       final cfg = di.get<Configuration>();
       final tokenUri = cfg.secure
-          ? Uri.https(cfg.loginUri, '/v1/authentication/token')
-          : Uri.http(cfg.loginUri, '/v1/authentication/token');
+          ? Uri.https(cfg.apiHost, '/v1/authentication/token')
+          : Uri.http(cfg.apiHost, '/v1/authentication/token');
 
       final body = {
         'grant_type': 'authorization_code',
@@ -75,22 +79,17 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
       }
 
       final json = jsonDecode(res.body) as Map<String, dynamic>;
-      final accessToken = json['access_token'] as String?;
-      final idToken = json['id_token'] as String?;
-      final refreshToken = json['refresh_token'] as String?;
-      final expiresIn = json['expires_in']?.toString();
+      final idToken = json['idToken'] as String;
+      final refreshToken = json['refreshToken'] as String;
+      final expiresIn = json['expiresIn'].toString();
+      final email = json['email'] as String;
+      final localId = json['localId'] as String;
 
-      if (accessToken == null) {
-        setState(() => _error = 'No access token returned');
-        return;
-      }
-
-      await prefs.setString('access_token', accessToken);
-      if (idToken != null) await prefs.setString('id_token', idToken);
-      if (refreshToken != null) {
-        await prefs.setString('refresh_token', refreshToken);
-      }
-      if (expiresIn != null) await prefs.setString('expires_in', expiresIn);
+      await prefs.setString('id_token', idToken);
+      await prefs.setString('expires_in', expiresIn);
+      await prefs.setString('email', email);
+      await prefs.setString('local_id', localId);
+      await prefs.setString('refresh_token', refreshToken);
 
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/app');

@@ -38,8 +38,8 @@ class Configuration {
         BuildEnvironment.prod => true,
       },
       apiHost: switch (env) {
-        BuildEnvironment.local => 'https://api.diskrot.com/v1',
-        BuildEnvironment.prod => 'https://api.diskrot.com/v1',
+        BuildEnvironment.local => 'localhost',
+        BuildEnvironment.prod => 'api.diskrot.com',
       },
       loginUri: switch (env) {
         BuildEnvironment.local => 'localhost:8081',
