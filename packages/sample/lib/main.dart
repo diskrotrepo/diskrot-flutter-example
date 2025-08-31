@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sample/application/app_screen.dart';
 import 'package:sample/auth/auth_guard.dart';
 import 'package:sample/dependency_context.dart';
+import 'package:sample/login/callback_screen.dart';
 import 'package:sample/theme.dart';
 
 import 'login/login.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/auth-check': (context) => const AuthCheckScreen(),
         '/login': (context) => const LoginScreen(),
+        '/oauth/callback': (context) => const OAuthCallbackScreen(),
       },
     );
   }

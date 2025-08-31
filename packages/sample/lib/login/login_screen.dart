@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:sample/configuration/configuration.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:watch_it/watch_it.dart';
 
@@ -24,19 +25,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _login() async {
     late Uri authUri;
+    final cfg = di.get<Configuration>();
 
-    if (di.get<Configuration>().secure) {
-      authUri = Uri.https(di.get<Configuration>().loginUri, '/authorize', {
-        'client_id': di.get<Configuration>().applicationId,
-        'redirect_uri': di.get<Configuration>().redirectUri,
-        'response_type': 'code',
-      });
+    final state = _csrfState();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('oauth_state', state);
+
+    final qp = {
+      'client_id': cfg.applicationId,
+      'redirect_uri': cfg.redirectUri,
+      'response_type': 'code',
+      'state': state,
+    };
+
+    if (cfg.secure) {
+      authUri = Uri.https(cfg.loginUri, '/authorize', qp);
     } else {
-      authUri = Uri.http(di.get<Configuration>().loginUri, '/authorize', {
-        'client_id': di.get<Configuration>().applicationId,
-        'redirect_uri': di.get<Configuration>().redirectUri,
-        'response_type': 'code',
-      });
+      authUri = Uri.http(cfg.loginUri, '/authorize', qp);
     }
 
     final ok = await launchUrlString(
@@ -44,9 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
       webOnlyWindowName: '_self',
     );
 
-    if (!ok && mounted) {
-      setState(() => _error = 'Could not open login page');
-    }
+    if (!ok && mounted) setState(() => _error = 'Could not open login page');
   }
 
   @override
