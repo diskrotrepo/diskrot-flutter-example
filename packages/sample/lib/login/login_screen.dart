@@ -16,7 +16,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String _error = '';
 
-  // Optional: CSRF state helper
   String _csrfState([int length = 32]) {
     final r = Random.secure();
     final bytes = List<int>.generate(length, (_) => r.nextInt(256));
@@ -58,7 +57,6 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          // Right half (single login button)
           Expanded(
             flex: 1,
             child: Center(

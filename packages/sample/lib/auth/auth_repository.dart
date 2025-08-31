@@ -24,11 +24,11 @@ class AuthRepository {
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('idToken');
-    await prefs.remove('refreshToken');
+    await prefs.remove('id_token');
+    await prefs.remove('refresh_token');
     await prefs.remove('email');
-    await prefs.remove('expiresIn');
-    await prefs.remove('displayName');
+    await prefs.remove('expires_in');
+    await prefs.remove('display_name');
   }
 
   Future<http.Response> register(String email, String password) {

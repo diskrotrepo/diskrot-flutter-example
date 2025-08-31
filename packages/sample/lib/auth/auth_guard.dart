@@ -20,7 +20,7 @@ class _AuthGuardState extends State<AuthGuard> {
 
   void _checkToken() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('idToken');
+    final token = prefs.getString('id_token');
 
     if (token != null) {
       setState(() {

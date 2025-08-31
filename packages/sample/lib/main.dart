@@ -28,7 +28,9 @@ class MyApp extends StatelessWidget {
         switch (uri.path) {
           case '/app':
             return MaterialPageRoute(
-                builder: (_) => const AuthGuard(child: AppScreen()));
+              settings: settings,
+              builder: (_) => const AuthGuard(child: LoggedInScreen()),
+            );
           case '/oauth/callback':
             return MaterialPageRoute(
                 builder: (_) => const OAuthCallbackScreen());
