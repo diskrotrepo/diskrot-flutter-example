@@ -10,12 +10,12 @@ class AuthRepository {
 
   Future<String?> getIdToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('idToken');
+    return prefs.getString('id_token');
   }
 
   Future<String?> getRefreshToken() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('refreshToken');
+    return prefs.getString('refresh_token');
   }
 
   Future<String?> getUserId() async {
