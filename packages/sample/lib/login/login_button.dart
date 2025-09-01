@@ -51,9 +51,9 @@ Future<void> loginAction() async {
   };
 
   if (cfg.secure) {
-    authUri = Uri.https(cfg.loginUri, '/authorize', qp);
+    authUri = Uri.https(cfg.loginUri, '/oauth2/authorize', qp);
   } else {
-    authUri = Uri.http(cfg.loginUri, '/authorize', qp);
+    authUri = Uri.http(cfg.loginUri, '/oauth2/authorize', qp);
   }
 
   await launchUrlString(
