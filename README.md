@@ -55,3 +55,9 @@ You will need to create the following repository secrets
 
 - GCP_SA_KEY:  A service account
 - GCP_PROJECT_ID: The name of your GCP project
+
+## To Do
+
+# Backend Example
+
+For now this project is focused on a simple Single Page Application (SPA). This project will be updated to show how to do a more complex project using a backend, and a diskrot API key. Do not check your API key into your repo as this is a secret.
