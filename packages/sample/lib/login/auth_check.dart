@@ -17,7 +17,7 @@ class _AuthCheckScreenState extends State<AuthCheckScreen> {
 
   void _checkAuth() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('idToken');
+    final token = prefs.getString('id_token');
 
     if (!mounted) return;
 

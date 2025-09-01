@@ -3,7 +3,6 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:sample/application/app_screen.dart';
 import 'package:sample/auth/auth_guard.dart';
 import 'package:sample/dependency_context.dart';
-import 'package:sample/login/callback_screen.dart';
 import 'package:sample/theme.dart';
 
 import 'login/login.dart';

@@ -45,6 +45,6 @@ class NoTransitionsBuilder extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    return child; // No animation
+    return child;
   }
 }

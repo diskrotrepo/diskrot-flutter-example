@@ -34,15 +34,15 @@ class Configuration {
         BuildEnvironment.prod => 'https://demo.diskrot.com/oauth/callback',
       },
       secure: switch (env) {
-        BuildEnvironment.local => false,
+        BuildEnvironment.local => true,
         BuildEnvironment.prod => true,
       },
       apiHost: switch (env) {
-        BuildEnvironment.local => 'localhost',
+        BuildEnvironment.local => 'api.diskrot.com',
         BuildEnvironment.prod => 'api.diskrot.com',
       },
       loginUri: switch (env) {
-        BuildEnvironment.local => 'localhost:8081',
+        BuildEnvironment.local => 'login.diskrot.com',
         BuildEnvironment.prod => 'login.diskrot.com',
       },
     );

@@ -1,9 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:sample/configuration/configuration.dart';
+import 'package:sample/dependency_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:sample/dependency_context.dart';
-import 'package:sample/configuration/configuration.dart';
 
 class OAuthCallbackScreen extends StatefulWidget {
   const OAuthCallbackScreen({super.key});
@@ -33,12 +36,14 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
         : null;
 
     if (error != null) {
+      print('OAuth error: $error, description: $errorDesc');
       setState(
           () => _error = '$error${errorDesc != null ? ": $errorDesc" : ""}');
       return;
     }
 
     if (code == null || code.isEmpty) {
+      print('Missing authorization code');
       setState(() => _error = 'Missing authorization code');
       return;
     }
@@ -47,6 +52,9 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
     final expectedState = prefs.getString('oauth_state');
     await prefs.remove('oauth_state');
     if (expectedState == null || expectedState != returnedState) {
+      print(expectedState == null
+          ? 'Missing state'
+          : 'Invalid state: expected $expectedState, got $returnedState');
       setState(() => _error = 'Invalid state');
       return;
     }
@@ -74,6 +82,7 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
       );
 
       if (res.statusCode != 200) {
+        print('Token exchange failed (${res.statusCode}): ${res.body}');
         setState(() => _error = 'Token exchange failed (${res.statusCode})');
         return;
       }
@@ -94,6 +103,7 @@ class _OAuthCallbackScreenState extends State<OAuthCallbackScreen> {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/app');
     } catch (e) {
+      print(e);
       if (!mounted) return;
       setState(() => _error = 'Unexpected error: $e');
     }

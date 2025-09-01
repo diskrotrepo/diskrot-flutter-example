@@ -1,0 +1,53 @@
+name: Build & Deploy flutter to GCP
+on:
+  push:
+    branches: [main]
+    paths:
+      - packages/sample/**
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        package: [sample]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: '3.35.1'          
+        cache: true
+
+    - name: Get pub packages
+      run: flutter pub get
+      working-directory: packages/${{ matrix.package }}
+
+    - name: Build for web (release)
+      run: flutter build web --release
+      working-directory: packages/${{ matrix.package }}
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: '${{ secrets.GCP_SA_KEY }}'
+    - name: Stage build output
+      run: |
+        mkdir -p /tmp/${{ matrix.package }}
+        cp -r packages/${{ matrix.package }}/build/web/* /tmp/${{ matrix.package }}/
+    - name: Upload to Cloud Storage bucket
+      uses: google-github-actions/upload-cloud-storage@v2
+      with:
+        path: /tmp/${{ matrix.package }}/
+        destination: demo.diskrot.com/    
+        parent: false   
+    - name: Invalidate Cloud CDN cache
+      run: |
+        gcloud compute url-maps invalidate-cdn-cache fediverse-url-map \
+          --project=${{ secrets.GCP_PROJECT_ID }} \
+          --path "/*" --async
+      env:
+        CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
