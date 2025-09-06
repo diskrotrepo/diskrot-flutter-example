@@ -130,10 +130,10 @@ class DiskRotHttpClient {
       if (refreshResponse.statusCode == 200) {
         final body = jsonDecode(refreshResponse.body);
         SharedPreferences.getInstance().then((prefs) {
-          prefs.setString('idToken', body['id_token']);
-          prefs.setString('accessToken', body['access_token']);
-          prefs.setString('refreshToken', body['refresh_token']);
-          prefs.setString('expiresIn', body['expires_in']);
+          prefs.setString('id_token', body['id_token']);
+          prefs.setString('access_token', body['access_token']);
+          prefs.setString('refresh_token', body['refresh_token']);
+          prefs.setString('expires_in', body['expires_in']);
         });
       } else {
         throw Exception('Failed to refresh token');

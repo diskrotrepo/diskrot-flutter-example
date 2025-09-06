@@ -14,9 +14,24 @@ The project is preconfigured to talk to the real diskrot authentication provider
 
 This command should be run from the packages/sample directory. It will launch the project in debug mode in Chrome on port 8090
 
-> flutter run -d chrome --web-port 8090
+```bash
+flutter run -d chrome --web-port 8090
+```
 
 Press `r` to perform a hot reload while developing your application.
+
+
+## Working with the sample app
+
+In theory you should only need to stylize the `login/login_screen.dart` to your liking. You shouldn't need to touch the other files in the `login` directory.
+
+## Bucket Setup
+
+Flutter is configured to follow the URL, so if you're using Google Cloud Storage you'll need to run the following command to ensure the bucket is routing requests to the index.html:
+
+```bash
+gsutil web set -m index.html -e index.html gs://demo.diskrot.com
+```
 
 ## Configuration
 
